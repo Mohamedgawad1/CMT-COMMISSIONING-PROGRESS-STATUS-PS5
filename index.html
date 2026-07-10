@@ -163,14 +163,14 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
 
     <div class="filter-bar">
       <label>Company:</label>
-      <select id="filterCompany" ><option value="PS5 (All)">PS5 (All Companies)</option>
+      <select id="filterCompany" onchange="renderOverall()"><option value="PS5 (All)">PS5 (All Companies)</option>
         <option value="CPP AGI">CPP AGI</option>
         <option value="EITS">EITS</option>
         <option value="KENT">KENT</option>
         <option value="EACOP">EACOP</option>
       </select>
       <label>Discipline:</label>
-      <select id="filterDiscOverall" >
+      <select id="filterDiscOverall" onchange="renderOverall()">
         <option value="ALL">ALL Disciplines</option>
       </select>
       <button class="btn-go" onclick="renderOverall()">🔍 Go</button>
@@ -199,11 +199,11 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
 
     <div class="filter-bar">
       <label>Company:</label>
-      <select id="filterApComp" >
+      <select id="filterApComp" onchange="renderAPunch()">
         <option value="ALL">All Companies</option>
       </select>
       <label>Discipline:</label>
-      <select id="filterApDisc" >
+      <select id="filterApDisc" onchange="renderAPunch()">
         <option value="ALL">All Disciplines</option>
       </select>
       <label>Search:</label>
@@ -231,15 +231,15 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
 
     <div class="filter-bar">
       <label>Milestone:</label>
-      <select id="filterSubMs" >
+      <select id="filterSubMs" onchange="renderSubsystem()">
         <option value="ALL">All Milestones</option>
       </select>
       <label>Discipline:</label>
-      <select id="filterSubDisc" >
+      <select id="filterSubDisc" onchange="renderSubsystem()">
         <option value="ALL">All Disciplines</option>
       </select>
       <label>Company:</label>
-      <select id="filterSubComp" >
+      <select id="filterSubComp" onchange="renderSubsystem()">
         <option value="ALL">All Companies</option>
       </select>
       <label>Search:</label>
@@ -271,7 +271,7 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
 
     <div class="filter-bar">
       <label>Test Pack:</label>
-      <select id="filterHtPack" >
+      <select id="filterHtPack" onchange="renderHydrotests()">
         <option value="ALL">All Test Packs</option>
         <option value="CLX01">CLX01 - Pipework Test Pack</option>
         <option value="CLX02A">CLX02A - Pipework Before Test</option>
@@ -308,19 +308,19 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
 
     <div class="filter-bar">
       <label>Company:</label>
-      <select id="filterTComp" >
+      <select id="filterTComp" onchange="renderTasks()">
         <option value="ALL">All Companies</option>
       </select>
       <label>Discipline:</label>
-      <select id="filterTDisc" >
+      <select id="filterTDisc" onchange="renderTasks()">
         <option value="ALL">All Disciplines</option>
       </select>
       <label>Milestone:</label>
-      <select id="filterTPri" >
+      <select id="filterTPri" onchange="renderTasks()">
         <option value="ALL">All Milestones</option>
       </select>
       <label>State:</label>
-      <select id="filterTState" >
+      <select id="filterTState" onchange="renderTasks()">
         <option value="ALL">All States</option>
       </select>
       <label>Search:</label>
