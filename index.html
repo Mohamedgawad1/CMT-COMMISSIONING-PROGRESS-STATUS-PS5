@@ -450,7 +450,7 @@ function renderOverall(){
   // KPIs
   const gt = src['Grand Total'];
   document.getElementById('overallKpis').innerHTML = `
-    <div class="kpi teal"><div class="icon">📋</div><div class="val">${gt ? gt.t : 0}</div><div class="lbl">Total Tasks (${comp})</div></div>
+    <div class="kpi teal"><div class="icon">📋</div><div class="val">${gt ? gt.t : 0}</div><div class="lbl">Total Tasks ${comp === 'PS5 (All)' ? '(All Companies)' : `(${comp})`}</div></div>
     <div class="kpi"><div class="icon">✅</div><div class="val">${gt ? gt.c : 0}</div><div class="lbl">Closed Tasks</div></div>
     <div class="kpi pink"><div class="icon">⏳</div><div class="val">${gt ? gt.p : 0}</div><div class="lbl">Pending Tasks</div></div>
     <div class="kpi gold"><div class="icon">📈</div><div class="val">${gt ? gt.pc : 0}%</div><div class="lbl">Completion Rate</div></div>
@@ -575,7 +575,7 @@ function renderAPunch(){
   const apByCompany = {}; const apByDisc = {};
   filtered.forEach(p => { apByCompany[p.co] = (apByCompany[p.co]||0)+1; apByDisc[p.di] = (apByDisc[p.di]||0)+1; });
   document.getElementById('apunchKpis').innerHTML = `
-    <div class="kpi pink"><div class="icon">📌</div><div class="val">${filtered.length}</div><div class="lbl">Filtered Open A-Punches</div></div>
+    <div class="kpi pink"><div class="icon">📌</div><div class="val">${filtered.length}</div><div class="lbl">Filtered Open Punches</div></div>
     <div class="kpi gold"><div class="icon">🔍</div><div class="val">${APUNCH.total}</div><div class="lbl">Total (Unfiltered)</div></div>
     <div class="kpi blue"><div class="icon">🏢</div><div class="val">${Object.keys(apByCompany).length}</div><div class="lbl">Companies</div></div>
     <div class="kpi teal"><div class="icon">📂</div><div class="val">${Object.keys(apByDisc).length}</div><div class="lbl">Disciplines</div></div>
