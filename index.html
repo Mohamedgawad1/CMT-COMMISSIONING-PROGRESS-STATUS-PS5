@@ -417,7 +417,7 @@ function initFilters(){
   Object.keys(APUNCH.by_discipline).forEach(d=>{ const o=document.createElement('option'); o.value=d; o.textContent=DISC_SHORT[d]||d; sel3.appendChild(o); });
   // Subsystem
   const sel4 = document.getElementById('filterSubMs');
-  MILESTONES.forEach(m=>{ const o=document.createElement('option'); o.value=m; o.textContent=m.replace('MILESTONE ','M-'); sel4.appendChild(o); });
+  Object.keys(ETASKS.by_priority).sort().forEach(m=>{ const o=document.createElement('option'); o.value=m; o.textContent=m.replace('PS5 - ','M-'); sel4.appendChild(o); });
   const sel5 = document.getElementById('filterSubDisc');
   DISC_NAMES.forEach(d=>{ const o=document.createElement('option'); o.value=d; o.textContent=d; sel5.appendChild(o); });
   const sel6 = document.getElementById('filterSubComp');
