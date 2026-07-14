@@ -666,7 +666,7 @@ function renderSubsystem(){
 
   // Filter ETASKS by company, discipline, milestone, and category (PCOM)
   let tasks = ETASKS.items.filter(t => {
-    if(t.ca !== 'PCOM - Precommissioning') return false;
+    if(t.ca !== 'PCOM - Precommissioning' && t.ca !== 'COM - Commissioning') return false;
     if(compF !== 'ALL' && t.co !== compF) return false;
     if(discF !== 'ALL' && t.ds !== discF) return false;
     if(msF !== 'ALL' && t.pr !== msF) return false;
@@ -689,6 +689,11 @@ function renderSubsystem(){
 
   // Build filtered list from SUBS, attach computed stats
   let filtered = SUBS.filter(s => {
+    const st = stats[s.sub] || {tt:0,cl:0};
+    // When ANY filter is set (comp/disc/ms), show only subsystems with tasks
+    if(compF !== 'ALL' || discF !== 'ALL' || msF !== 'ALL'){
+      if(st.tt === 0) return false;
+    }
     if(search && !s.sub.toLowerCase().includes(search) && !s.sys.toLowerCase().includes(search)) return false;
     return true;
   }).map(s => {
