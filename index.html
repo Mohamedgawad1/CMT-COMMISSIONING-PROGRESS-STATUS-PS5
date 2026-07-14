@@ -236,6 +236,7 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
   <div class="section" id="page-subsystem">
     <div class="section-title">🏗️ Subsystem Progress by Milestone, Discipline & Company</div>
     <div class="kpi-row" id="subKpis"></div>
+    <div id="subDebug" style="font-size:11px;color:red;padding:4px 8px;background:#fff3f3;border-radius:4px;margin-bottom:8px;">debug...</div>
 
     <div class="filter-bar">
       <label>Milestone:</label>
@@ -657,12 +658,11 @@ function getUniquePriorities(){
 }
 
 function renderSubsystem(){
+  try {
   const msF = document.getElementById('filterSubMs').value;
   const discF = document.getElementById('filterSubDisc').value;
   const compF = document.getElementById('filterSubComp').value;
   const search = document.getElementById('searchSub').value.toLowerCase().trim();
-  console.log('renderSubsystem: msF=',msF,'discF=',discF,'compF=',compF,'search=',search);
-  console.log('ETASKS.items length=',ETASKS.items.length);
 
   // Filter ETASKS by company, discipline, milestone, and category (PCOM)
   let tasks = ETASKS.items.filter(t => {
@@ -672,11 +672,6 @@ function renderSubsystem(){
     if(msF !== 'ALL' && t.pr !== msF) return false;
     return true;
   });
-  console.log('tasks after ETASKS filter: count=',tasks.length);
-  if(tasks.length===0 && compF!=='ALL') console.log('company sample in ETASKS:',ETASKS.items.slice(0,3).map(t=>t.co));
-  if(tasks.length===0 && discF!=='ALL') console.log('disc sample in ETASKS:',ETASKS.items.slice(0,3).map(t=>t.ds));
-  if(tasks.length===0 && msF!=='ALL') console.log('pri sample in ETASKS:',ETASKS.items.slice(0,3).map(t=>t.pr));
-  console.log('PCOM sample:',ETASKS.items.slice(0,3).map(t=>t.ca));
 
   // Per-subsystem stats from filtered tasks
   const stats = {};
@@ -685,7 +680,6 @@ function renderSubsystem(){
     stats[t.su].tt++;
     if(t.st === 'Closed') stats[t.su].cl++;
   });
-  console.log('stats keys count=',Object.keys(stats).length);
 
   // Filter APUNCH by company + category A (matches J5 filter in Excel)
   let punches = APUNCH.items.filter(p => p.ca === 'A');
@@ -715,7 +709,7 @@ function renderSubsystem(){
   const totalAp = filtered.reduce((a,s)=>a+s.ap,0);
   const completed = filtered.filter(s => s.st==='COMPLETED').length;
   const pct = totalTasks ? Math.round(closedTasks/totalTasks*100*10)/10 : 0;
-  console.log('subsystem KPIs:',{subsystems:filtered.length, totalTasks, closedTasks, totalAp, completed, pct});
+  document.getElementById('subDebug').innerHTML = `msF=${msF} compF=${compF} discF=${discF} search=${search} tasks=${tasks.length} stats=${Object.keys(stats).length} filtered=${filtered.length} kpis={${filtered.length},${totalTasks},${closedTasks},${totalAp},${completed},${pct}}`;
 
   document.getElementById('subKpis').innerHTML = `
     <div class="kpi"><div class="icon">📋</div><div class="val">${filtered.length}</div><div class="lbl">Subsystems</div></div>
@@ -805,6 +799,7 @@ function renderSubsystem(){
     <button onclick="subPage=${totalPg};renderSubsystem()" ${subPage>=totalPg?'disabled':''}>»</button>
     <span style="font-size:12px;color:var(--muted);margin-left:8px;">${filtered.length} items</span>`;
   document.getElementById('subPagination').innerHTML = pagHtml;
+}catch(e){document.getElementById('subDebug').innerHTML='ERROR: '+e.message+' at line '+e.lineNumber;}
 }
 
 const _charts = {};
