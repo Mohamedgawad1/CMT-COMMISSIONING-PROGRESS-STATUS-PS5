@@ -662,18 +662,50 @@ function renderSubsystem(){
   const compF = document.getElementById('filterSubComp').value;
   const search = document.getElementById('searchSub').value.toLowerCase().trim();
 
+  // Filter ETASKS by company, discipline, milestone, and category (PCOM)
+  let tasks = ETASKS.items.filter(t => {
+    if(t.ca !== 'PCOM - Precommissioning') return false;
+    if(compF !== 'ALL' && t.co !== compF) return false;
+    if(discF !== 'ALL' && t.ds !== discF) return false;
+    if(msF !== 'ALL' && t.pr !== msF) return false;
+    return true;
+  });
+
+  // Per-subsystem stats from filtered tasks
+  const stats = {};
+  tasks.forEach(t => {
+    if(!stats[t.su]) stats[t.su] = {tt:0,cl:0};
+    stats[t.su].tt++;
+    if(t.st === 'Closed') stats[t.su].cl++;
+  });
+
+  // Filter APUNCH by company + category A (matches J5 filter in Excel)
+  let punches = APUNCH.items.filter(p => p.ca === 'A');
+  if(compF !== 'ALL') punches = punches.filter(p => p.co === compF);
+  const apCount = {};
+  punches.forEach(p => { if(p.su) apCount[p.su] = (apCount[p.su]||0)+1; });
+
+  // Build filtered list from SUBS, attach computed stats
   let filtered = SUBS.filter(s => {
-    if(msF !== 'ALL' && s.pri !== msF) return false;
-    if(compF !== 'ALL' && s.co !== compF) return false;
     if(search && !s.sub.toLowerCase().includes(search) && !s.sys.toLowerCase().includes(search)) return false;
     return true;
+  }).map(s => {
+    const st = stats[s.sub] || {tt:0,cl:0};
+    return {
+      sys:s.sys, sub:s.sub, pri:s.pri, st:s.st,
+      tt: st.tt,
+      cl: st.cl,
+      pd: st.tt - st.cl,
+      pc: st.tt ? Math.round(st.cl/st.tt*1000)/10 : 0,
+      ap: apCount[s.sub] || 0
+    };
   });
 
   // KPIs
   const totalTasks = filtered.reduce((a,s)=>a+s.tt,0);
   const closedTasks = filtered.reduce((a,s)=>a+s.cl,0);
   const totalAp = filtered.reduce((a,s)=>a+s.ap,0);
-  const completed = filtered.filter(s => s.st === 'COMPLETED').length;
+  const completed = filtered.filter(s => s.st==='COMPLETED').length;
   const pct = totalTasks ? Math.round(closedTasks/totalTasks*100*10)/10 : 0;
 
   document.getElementById('subKpis').innerHTML = `
@@ -685,7 +717,6 @@ function renderSubsystem(){
 
   // Top 20 chart
   const sorted = [...filtered].sort((a,b)=>b.pc - a.pc).slice(0,20);
-  //destroyChart('chartSubTop');
   makeChart('chartSubTop', {
     type:'bar',
     data:{ labels: sorted.map(s=>s.sub.split(' - ').pop()),
@@ -698,7 +729,6 @@ function renderSubsystem(){
   const msCount = {};
   filtered.forEach(s => { const k = s.pri.replace('PS5 - ',''); msCount[k] = (msCount[k]||0)+1; });
   const msLabels = Object.keys(msCount).sort();
-  //destroyChart('chartSubMs');
   makeChart('chartSubMs', {
     type:'pie',
     data:{ labels:msLabels, datasets:[{ data:msLabels.map(k=>msCount[k]), backgroundColor:MS_COLORS, datalabels:DL_PIE }] },
@@ -707,7 +737,6 @@ function renderSubsystem(){
 
   // A-punch by subsystem (top 15)
   const topAp = [...filtered].sort((a,b)=>b.ap - a.ap).slice(0,15);
-  //destroyChart('chartSubAp');
   makeChart('chartSubAp', {
     type:'bar',
     data:{ labels: topAp.map(s=>s.sub.split(' - ').pop()),
@@ -720,7 +749,6 @@ function renderSubsystem(){
   const statusCount = {};
   filtered.forEach(s => { const k = s.st || 'In Progress'; statusCount[k] = (statusCount[k]||0)+1; });
   const stLabels = Object.keys(statusCount);
-  //destroyChart('chartSubStatus');
   makeChart('chartSubStatus', {
     type:'doughnut',
     data:{ labels:stLabels, datasets:[{ data:stLabels.map(k=>statusCount[k]), backgroundColor:palette, datalabels:DL_PIE }] },
@@ -730,8 +758,8 @@ function renderSubsystem(){
   // Table
   const totalPg = Math.ceil(filtered.length / SUB_PER_PAGE);
   if(subPage > totalPg) subPage = 1;
-  const st = (subPage-1)*SUB_PER_PAGE;
-  const pgItems = filtered.slice(st, st+SUB_PER_PAGE);
+  const stt = (subPage-1)*SUB_PER_PAGE;
+  const pgItems = filtered.slice(stt, stt+SUB_PER_PAGE);
 
   let html = `<table class="data-table" style="min-width:1100px;"><thead><tr>
     <th style="text-align:left;">System</th>
