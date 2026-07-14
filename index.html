@@ -221,6 +221,7 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
     <div class="chart-row">
       <div class="chart-card"><h3>Open Punches by Company</h3><canvas id="chartApComp"></canvas></div>
       <div class="chart-card"><h3>Open Punches by Discipline</h3><canvas id="chartApDisc"></canvas></div>
+      <div class="chart-card"><h3>Open Punches by Category</h3><canvas id="chartApCat"></canvas></div>
     </div>
 
     <div class="section-title" style="font-size:15px;border-left-color:var(--accent);">📋 Open A-Punch Items</div>
@@ -573,12 +574,14 @@ function renderAPunch(){
 
   // KPIs (from filtered)
   const apByCompany = {}; const apByDisc = {};
-  filtered.forEach(p => { apByCompany[p.co] = (apByCompany[p.co]||0)+1; apByDisc[p.di] = (apByDisc[p.di]||0)+1; });
+  const apByCat = {};
+  filtered.forEach(p => { apByCompany[p.co] = (apByCompany[p.co]||0)+1; apByDisc[p.di] = (apByDisc[p.di]||0)+1; apByCat[p.ca] = (apByCat[p.ca]||0)+1; });
   document.getElementById('apunchKpis').innerHTML = `
     <div class="kpi pink"><div class="icon">📌</div><div class="val">${filtered.length}</div><div class="lbl">Filtered Open Punches</div></div>
     <div class="kpi gold"><div class="icon">🔍</div><div class="val">${APUNCH.total}</div><div class="lbl">Total (Unfiltered)</div></div>
     <div class="kpi blue"><div class="icon">🏢</div><div class="val">${Object.keys(apByCompany).length}</div><div class="lbl">Companies</div></div>
     <div class="kpi teal"><div class="icon">📂</div><div class="val">${Object.keys(apByDisc).length}</div><div class="lbl">Disciplines</div></div>
+    <div class="kpi blue"><div class="icon">🏷️</div><div class="val">${Object.keys(apByCat).length}</div><div class="lbl">Categories</div></div>
   `;
 
   // Charts (from filtered)
@@ -596,6 +599,14 @@ function renderAPunch(){
   makeChart('chartApDisc', {
     type:'pie',
     data:{ labels:discFullLabels, datasets:[{ data:discLabels.map(k=>apByDisc[k]), backgroundColor:palette, datalabels:DL_PIE }] },
+    options:{ plugins:{legend:{position:'bottom'}} }
+  });
+
+  destroyChart('chartApCat');
+  const catLabels = Object.keys(apByCat).sort();
+  makeChart('chartApCat', {
+    type:'doughnut',
+    data:{ labels:catLabels, datasets:[{ data:catLabels.map(k=>apByCat[k]), backgroundColor:['#ff4d8d','#ffb627','#3da8ff'], datalabels:DL_PIE }] },
     options:{ plugins:{legend:{position:'bottom'}} }
   });
 
