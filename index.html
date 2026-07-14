@@ -236,7 +236,6 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
   <div class="section" id="page-subsystem">
     <div class="section-title">🏗️ Subsystem Progress by Milestone, Discipline & Company</div>
     <div class="kpi-row" id="subKpis"></div>
-    <div id="subDebug" style="font-size:11px;color:red;padding:4px 8px;background:#fff3f3;border-radius:4px;margin-bottom:8px;">debug...</div>
 
     <div class="filter-bar">
       <label>Milestone:</label>
@@ -658,7 +657,6 @@ function getUniquePriorities(){
 }
 
 function renderSubsystem(){
-  try {
   const msF = document.getElementById('filterSubMs').value;
   const discF = document.getElementById('filterSubDisc').value;
   const compF = document.getElementById('filterSubComp').value;
@@ -714,7 +712,6 @@ function renderSubsystem(){
   const totalAp = filtered.reduce((a,s)=>a+s.ap,0);
   const completed = filtered.filter(s => s.st==='COMPLETED').length;
   const pct = totalTasks ? Math.round(closedTasks/totalTasks*100*10)/10 : 0;
-  document.getElementById('subDebug').innerHTML = `msF=${msF} compF=${compF} discF=${discF} search=${search} tasks=${tasks.length} stats=${Object.keys(stats).length} filtered=${filtered.length} kpis={${filtered.length},${totalTasks},${closedTasks},${totalAp},${completed},${pct}}`;
 
   document.getElementById('subKpis').innerHTML = `
     <div class="kpi"><div class="icon">📋</div><div class="val">${filtered.length}</div><div class="lbl">Subsystems</div></div>
@@ -804,7 +801,6 @@ function renderSubsystem(){
     <button onclick="subPage=${totalPg};renderSubsystem()" ${subPage>=totalPg?'disabled':''}>»</button>
     <span style="font-size:12px;color:var(--muted);margin-left:8px;">${filtered.length} items</span>`;
   document.getElementById('subPagination').innerHTML = pagHtml;
-}catch(e){document.getElementById('subDebug').innerHTML='ERROR: '+e.message+' at line '+e.lineNumber;}
 }
 
 const _charts = {};
