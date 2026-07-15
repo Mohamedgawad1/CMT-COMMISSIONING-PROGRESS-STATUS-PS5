@@ -710,7 +710,7 @@ function renderSubsystem(){
   const totalTasks = filtered.reduce((a,s)=>a+s.tt,0);
   const closedTasks = filtered.reduce((a,s)=>a+s.cl,0);
   const totalAp = filtered.reduce((a,s)=>a+s.ap,0);
-  const completed = filtered.filter(s => s.st==='COMPLETED').length;
+  const completed = filtered.filter(s => s.tt > 0 && s.cl === s.tt).length;
   const pct = totalTasks ? Math.round(closedTasks/totalTasks*100*10)/10 : 0;
 
   document.getElementById('subKpis').innerHTML = `
