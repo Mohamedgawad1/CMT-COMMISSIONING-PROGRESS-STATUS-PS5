@@ -662,17 +662,24 @@ function renderSubsystem(){
   const compF = document.getElementById('filterSubComp').value;
   const search = document.getElementById('searchSub').value.toLowerCase().trim();
 
-  // Filter ETASKS by company, discipline, milestone, and category
+  // Filter ETASKS by company, discipline, milestone, and category (matches Excel COUNTIFS with <>Blank)
   let tasks = ETASKS.items.filter(t => {
-    if(t.ca !== 'PCOM - Precommissioning' && t.ca !== 'COM - Commissioning') return false;
+    if(t.ca !== 'PCOM - Precommissioning') return false; // Excel: H:H = "PCOM - Precommissioning"
+    if(t.st === 'Blank' || t.st === '') return false; // Excel: AC:AC <> "Blank"
     if(compF !== 'ALL' && t.co !== compF) return false;
     if(discF !== 'ALL' && t.ds !== discF) return false;
     return true;
   });
 
-  // Per-subsystem stats from filtered tasks
+  // Per-subsystem priority map from SUBS (matches Excel: each row counts tasks with same priority as D column)
+  const subPri = {};
+  SUBS.forEach(s => { subPri[s.sub] = s.pri; });
+
+  // Per-subsystem stats from filtered tasks (only tasks matching subsystem's priority, per Excel D column)
   const stats = {};
   tasks.forEach(t => {
+    const pri = subPri[t.su];
+    if(pri && t.pr !== pri) return; // skip tasks whose priority doesn't match the subsystem's D column
     if(!stats[t.su]) stats[t.su] = {tt:0,cl:0};
     stats[t.su].tt++;
     if(t.st === 'Closed') stats[t.su].cl++;
