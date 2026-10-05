@@ -1155,7 +1155,8 @@ function renderHydrotests(){
   } else {
     html += '<td class="tot">'+TOTAL_ROW.closed+'</td><td class="tot">'+TOTAL_ROW.pct+'%</td>';
   }
-  html += '</tr></table></body></html>';
+  html += '</tr></table><div class="section" id="page-ps6"><div class="section-title">🏭 PS6 - SUBSYSTEMS PROGRESS</div></div>
+</body></html>';
   downloadExcel(html, 'Hydrotests_Summary');
 }
 // ==================== EXPORTS ====================
@@ -1209,7 +1210,8 @@ function exportOverallExcel(){
     });
     html += `</tr>`;
   }
-  html += `</table></body></html>`;
+  html += `</table><div class="section" id="page-ps6"><div class="section-title">🏭 PS6 - SUBSYSTEMS PROGRESS</div></div>
+</body></html>`;
   downloadExcel(html, 'Overall_Progress_' + comp.replace(/\s+/g,'_'));
 }
 
@@ -1228,7 +1230,8 @@ function exportAPunchExcel(){
   filtered.forEach(p => {
     html += `<tr><td style="font-weight:bold;color:#C00000;">${p.id}</td><td>${p.as}</td><td>${DISC_SHORT[p.di]||p.di||'-'}</td><td>${p.co}</td><td>${p.su}</td><td>${p.de}</td></tr>`;
   });
-  html += `</table></body></html>`;
+  html += `</table><div class="section" id="page-ps6"><div class="section-title">🏭 PS6 - SUBSYSTEMS PROGRESS</div></div>
+</body></html>`;
   downloadExcel(html, 'Open_A_Punches');
 }
 
@@ -1249,7 +1252,8 @@ function exportSubsystemExcel(){
     html += `<tr><td>${s.sys}</td><td style="font-weight:bold;">${s.sub}</td><td>${s.pri}</td>
       <td>${s.tt}</td><td>${s.cl}</td><td>${s.pd}</td><td>${s.pc}%</td><td>${s.ap}</td><td>${s.st||'In Progress'}</td></tr>`;
   });
-  html += `</table></body></html>`;
+  html += `</table><div class="section" id="page-ps6"><div class="section-title">🏭 PS6 - SUBSYSTEMS PROGRESS</div></div>
+</body></html>`;
   downloadExcel(html, 'Subsystem_Progress');
 }
 
@@ -1277,7 +1281,8 @@ function exportTasksExcel(){
       <td>${DISC_SHORT[t.di]||t.di||'-'}</td><td>${t.co}</td><td>${t.su}</td>
       <td>${t.pr.replace('PS5 - ','')}</td><td>${t.st}</td></tr>`;
   });
-  html += `</table></body></html>`;
+  html += `</table><div class="section" id="page-ps6"><div class="section-title">🏭 PS6 - SUBSYSTEMS PROGRESS</div></div>
+</body></html>`;
   downloadExcel(html, 'Exported_Tasks');
 }
 
@@ -1290,5 +1295,8 @@ renderSubsystem();
 renderTasks();
 renderHydrotests();
 </script>
+<div class="section" id="page-ps6"><div class="section-title">🏭 PS6 - SUBSYSTEMS PROGRESS</div></div>
 </body>
 </html>
+
+
