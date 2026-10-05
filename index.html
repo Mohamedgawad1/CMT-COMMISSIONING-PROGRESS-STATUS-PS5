@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
@@ -161,7 +161,7 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
 
     <div class="kpi-row" id="overallKpis"></div>
 
-    <div class="filter-bar"><label>Completion Phase:</label><select id="filterPS6Phase"><option value="ALL">All (PCOM & COM)</option><option value="PCOM - Precommissioning">PCOM - Precommissioning</option><option value="COM - Commissioning">COM - Commissioning</option></select><label>Search:</label><input id="searchPS6" type="text">
+    <div class="filter-bar">
       <label>Company:</label>
       <select id="filterCompany" onchange="renderOverall()"><option value="PS5 (All)">PS5 (All Companies)</option>
         <option value="CPP AGI">CPP AGI</option>
@@ -197,7 +197,7 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
     <div class="section-title">📌 Status of Open Punches (A / B / C)</div>
     <div class="kpi-row" id="apunchKpis"></div>
 
-    <div class="filter-bar"><label>Completion Phase:</label><select id="filterPS6Phase"><option value="ALL">All (PCOM & COM)</option><option value="PCOM - Precommissioning">PCOM - Precommissioning</option><option value="COM - Commissioning">COM - Commissioning</option></select><label>Search:</label><input id="searchPS6" type="text">
+    <div class="filter-bar">
       <label>Category:</label>
       <select id="filterApCat" onchange="renderAPunch()">
         <option value="ALL">All Categories</option>
@@ -233,7 +233,7 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
     <div class="section-title">🏗️ Subsystem Progress by Milestone, Discipline & Company</div>
     <div class="kpi-row" id="subKpis"></div>
 
-    <div class="filter-bar"><label>Completion Phase:</label><select id="filterPS6Phase"><option value="ALL">All (PCOM & COM)</option><option value="PCOM - Precommissioning">PCOM - Precommissioning</option><option value="COM - Commissioning">COM - Commissioning</option></select><label>Search:</label><input id="searchPS6" type="text">
+    <div class="filter-bar">
       <label>Milestone:</label>
       <select id="filterSubMs" onchange="renderSubsystem()">
         <option value="ALL">All Milestones</option>
@@ -279,7 +279,7 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
     <div class="section-title">💧 Hydrotests Summary — PS5</div>
     <div class="kpi-row" id="htKpis"></div>
 
-    <div class="filter-bar"><label>Completion Phase:</label><select id="filterPS6Phase"><option value="ALL">All (PCOM & COM)</option><option value="PCOM - Precommissioning">PCOM - Precommissioning</option><option value="COM - Commissioning">COM - Commissioning</option></select><label>Search:</label><input id="searchPS6" type="text">
+    <div class="filter-bar">
       <label>Test Pack:</label>
       <select id="filterHtPack" onchange="renderHydrotests()">
         <option value="ALL">All Test Packs</option>
@@ -316,7 +316,7 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
     <div class="section-title">📋 Exported Tasks — Full Task Registry</div>
     <div class="kpi-row" id="tasksKpis"></div>
 
-    <div class="filter-bar"><label>Completion Phase:</label><select id="filterPS6Phase"><option value="ALL">All (PCOM & COM)</option><option value="PCOM - Precommissioning">PCOM - Precommissioning</option><option value="COM - Commissioning">COM - Commissioning</option></select><label>Search:</label><input id="searchPS6" type="text">
+    <div class="filter-bar">
       <label>Company:</label>
       <select id="filterTComp" onchange="renderTasks()">
         <option value="ALL">All Companies</option>
