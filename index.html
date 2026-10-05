@@ -732,7 +732,7 @@ function renderSubsystem(){
     <div class="kpi"><div class="icon">📋</div><div class="val">${filtered.length}</div><div class="lbl">Subsystems</div></div>
     <div class="kpi teal"><div class="icon">✅</div><div class="val">${completed}</div><div class="lbl">Completed</div></div>
     <div class="kpi gold"><div class="icon">📈</div><div class="val">${pct}%</div><div class="lbl">Avg Task Completion</div></div>
-    <div class="kpi pink"><div class="icon">📌</div><div class="val">${totalAp}</div><div class="lbl">Open Punches</div></div>
+    <div class="kpi pink"><div class="icon">📌</div><div class="val">${totalAp}</div><div class="lbl">Open A-Punches</div></div>
   `;
 
   // Top 20 chart
@@ -763,7 +763,7 @@ function renderSubsystem(){
   makeChart('chartSubAp', {
     type:'bar',
     data:{ labels: topAp.map(s=>s.sub.split(' - ').pop()),
-      datasets:[{label:'Open Punches', data:topAp.map(s=>s.ap), backgroundColor:'#ff4d8d', datalabels:{...DL_BAR, anchor:'end', align:'right'}}]
+      datasets:[{label:'Open A-Punches', data:topAp.map(s=>s.ap), backgroundColor:'#ff4d8d', datalabels:{...DL_BAR, anchor:'end', align:'right'}}]
     },
     options:{ indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true}} }
   });
@@ -1156,10 +1156,7 @@ function renderHydrotests(){
   } else {
     html += '<td class="tot">'+TOTAL_ROW.closed+'</td><td class="tot">'+TOTAL_ROW.pct+'%</td>';
   }
-  html += '</tr></table><script>
-function renderPS6(){}
-</script>
-</body></html>';
+  html += '</tr></table></body></html>';
   downloadExcel(html, 'Hydrotests_Summary');
 }
 // ==================== EXPORTS ====================
@@ -1213,10 +1210,7 @@ function exportOverallExcel(){
     });
     html += `</tr>`;
   }
-  html += `</table><script>
-function renderPS6(){}
-</script>
-</body></html>`;
+  html += `</table></body></html>`;
   downloadExcel(html, 'Overall_Progress_' + comp.replace(/\s+/g,'_'));
 }
 
@@ -1230,15 +1224,12 @@ function exportAPunchExcel(){
     if(search) return p.id.toLowerCase().includes(search) || p.as.toLowerCase().includes(search);
     return true;
   });
-  let html = buildExcelHeader('Open Punches List');
+  let html = buildExcelHeader('Open A-Punches List');
   html += `<tr><th class="hdr">PL ID</th><th class="hdr" style="text-align:left;">Asset Tag</th><th class="hdr">Discipline</th><th class="hdr">Company</th><th class="hdr" style="text-align:left;">Subsystem</th><th class="hdr" style="text-align:left;">Description</th></tr>`;
   filtered.forEach(p => {
     html += `<tr><td style="font-weight:bold;color:#C00000;">${p.id}</td><td>${p.as}</td><td>${DISC_SHORT[p.di]||p.di||'-'}</td><td>${p.co}</td><td>${p.su}</td><td>${p.de}</td></tr>`;
   });
-  html += `</table><script>
-function renderPS6(){}
-</script>
-</body></html>`;
+  html += `</table></body></html>`;
   downloadExcel(html, 'Open_A_Punches');
 }
 
@@ -1259,10 +1250,7 @@ function exportSubsystemExcel(){
     html += `<tr><td>${s.sys}</td><td style="font-weight:bold;">${s.sub}</td><td>${s.pri}</td>
       <td>${s.tt}</td><td>${s.cl}</td><td>${s.pd}</td><td>${s.pc}%</td><td>${s.ap}</td><td>${s.st||'In Progress'}</td></tr>`;
   });
-  html += `</table><script>
-function renderPS6(){}
-</script>
-</body></html>`;
+  html += `</table></body></html>`;
   downloadExcel(html, 'Subsystem_Progress');
 }
 
@@ -1290,10 +1278,7 @@ function exportTasksExcel(){
       <td>${DISC_SHORT[t.di]||t.di||'-'}</td><td>${t.co}</td><td>${t.su}</td>
       <td>${t.pr.replace('PS5 - ','')}</td><td>${t.st}</td></tr>`;
   });
-  html += `</table><script>
-function renderPS6(){}
-</script>
-</body></html>`;
+  html += `</table></body></html>`;
   downloadExcel(html, 'Exported_Tasks');
 }
 
@@ -1306,11 +1291,5 @@ renderSubsystem();
 renderTasks();
 renderHydrotests();
 </script>
-<script>
-function renderPS6(){}
-</script>
 </body>
 </html>
-
-
-
