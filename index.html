@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
@@ -153,6 +153,7 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
     <div class="tab-btn" onclick="switchTab('page-subsystem')">🏗️ 3. Subsystem Progress</div>
     <div class="tab-btn" onclick="switchTab('page-tasks')">📋 4. Exported Tasks</div>
     <div class="tab-btn" onclick="switchTab('page-hydrotests')">💧 5. Hydrotests Summary</div>
+    <div class="tab-btn" onclick="switchTab('page-ps6')">🏭 6. PS6 - SUBSYSTEMS PROGRESS</div>
   </div>
 
   <!-- ===================== PAGE 1: OVERALL PROGRESS ===================== -->
@@ -1155,7 +1156,10 @@ function renderHydrotests(){
   } else {
     html += '<td class="tot">'+TOTAL_ROW.closed+'</td><td class="tot">'+TOTAL_ROW.pct+'%</td>';
   }
-  html += '</tr></table></body></html>';
+  html += '</tr></table><script>
+function renderPS6(){}
+</script>
+</body></html>';
   downloadExcel(html, 'Hydrotests_Summary');
 }
 // ==================== EXPORTS ====================
@@ -1209,7 +1213,10 @@ function exportOverallExcel(){
     });
     html += `</tr>`;
   }
-  html += `</table></body></html>`;
+  html += `</table><script>
+function renderPS6(){}
+</script>
+</body></html>`;
   downloadExcel(html, 'Overall_Progress_' + comp.replace(/\s+/g,'_'));
 }
 
@@ -1228,7 +1235,10 @@ function exportAPunchExcel(){
   filtered.forEach(p => {
     html += `<tr><td style="font-weight:bold;color:#C00000;">${p.id}</td><td>${p.as}</td><td>${DISC_SHORT[p.di]||p.di||'-'}</td><td>${p.co}</td><td>${p.su}</td><td>${p.de}</td></tr>`;
   });
-  html += `</table></body></html>`;
+  html += `</table><script>
+function renderPS6(){}
+</script>
+</body></html>`;
   downloadExcel(html, 'Open_A_Punches');
 }
 
@@ -1249,7 +1259,10 @@ function exportSubsystemExcel(){
     html += `<tr><td>${s.sys}</td><td style="font-weight:bold;">${s.sub}</td><td>${s.pri}</td>
       <td>${s.tt}</td><td>${s.cl}</td><td>${s.pd}</td><td>${s.pc}%</td><td>${s.ap}</td><td>${s.st||'In Progress'}</td></tr>`;
   });
-  html += `</table></body></html>`;
+  html += `</table><script>
+function renderPS6(){}
+</script>
+</body></html>`;
   downloadExcel(html, 'Subsystem_Progress');
 }
 
@@ -1277,7 +1290,10 @@ function exportTasksExcel(){
       <td>${DISC_SHORT[t.di]||t.di||'-'}</td><td>${t.co}</td><td>${t.su}</td>
       <td>${t.pr.replace('PS5 - ','')}</td><td>${t.st}</td></tr>`;
   });
-  html += `</table></body></html>`;
+  html += `</table><script>
+function renderPS6(){}
+</script>
+</body></html>`;
   downloadExcel(html, 'Exported_Tasks');
 }
 
@@ -1290,5 +1306,9 @@ renderSubsystem();
 renderTasks();
 renderHydrotests();
 </script>
+<script>
+function renderPS6(){}
+</script>
 </body>
 </html>
+
