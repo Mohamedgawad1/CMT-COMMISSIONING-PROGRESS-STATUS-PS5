@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
@@ -131,7 +131,7 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
   <h2>🛢️ PS5 CMT Dashboard</h2>
   <div class="grp">📊 Pages</div>
   <label><input type="checkbox" data-target="page-overall" checked> 1. Overall Progress</label>
-  <label><input type="checkbox" data-target="page-apunch" checked> 2. Open A-Punches</label>
+  <label><input type="checkbox" data-target="page-apunch" checked> 2. Open Punches</label>
   <label><input type="checkbox" data-target="page-subsystem" checked> 3. Subsystem Progress</label>
   <label><input type="checkbox" data-target="page-tasks" checked> 4. Exported Tasks</label>
   <label><input type="checkbox" data-target="page-hydrotests" checked> 5. Hydrotests Summary</label>
@@ -149,10 +149,11 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
   <!-- ===================== TABS ===================== -->
   <div class="tab-bar">
     <div class="tab-btn active" onclick="switchTab('page-overall')">📈 1. Overall Progress</div>
-    <div class="tab-btn" onclick="switchTab('page-apunch')">📌 2. Open A-Punches</div>
+    <div class="tab-btn" onclick="switchTab('page-apunch')">📌 2. Open Punches</div>
     <div class="tab-btn" onclick="switchTab('page-subsystem')">🏗️ 3. Subsystem Progress</div>
     <div class="tab-btn" onclick="switchTab('page-tasks')">📋 4. Exported Tasks</div>
     <div class="tab-btn" onclick="switchTab('page-hydrotests')">💧 5. Hydrotests Summary</div>
+    <div class="tab-btn" onclick="switchTab('page-ps6')">🏭 6. PS6 - SUBSYSTEMS PROGRESS</div>
   </div>
 
   <!-- ===================== PAGE 1: OVERALL PROGRESS ===================== -->
@@ -731,7 +732,7 @@ function renderSubsystem(){
     <div class="kpi"><div class="icon">📋</div><div class="val">${filtered.length}</div><div class="lbl">Subsystems</div></div>
     <div class="kpi teal"><div class="icon">✅</div><div class="val">${completed}</div><div class="lbl">Completed</div></div>
     <div class="kpi gold"><div class="icon">📈</div><div class="val">${pct}%</div><div class="lbl">Avg Task Completion</div></div>
-    <div class="kpi pink"><div class="icon">📌</div><div class="val">${totalAp}</div><div class="lbl">Open A-Punches</div></div>
+    <div class="kpi pink"><div class="icon">📌</div><div class="val">${totalAp}</div><div class="lbl">Open Punches</div></div>
   `;
 
   // Top 20 chart
@@ -762,7 +763,7 @@ function renderSubsystem(){
   makeChart('chartSubAp', {
     type:'bar',
     data:{ labels: topAp.map(s=>s.sub.split(' - ').pop()),
-      datasets:[{label:'Open A-Punches', data:topAp.map(s=>s.ap), backgroundColor:'#ff4d8d', datalabels:{...DL_BAR, anchor:'end', align:'right'}}]
+      datasets:[{label:'Open Punches', data:topAp.map(s=>s.ap), backgroundColor:'#ff4d8d', datalabels:{...DL_BAR, anchor:'end', align:'right'}}]
     },
     options:{ indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true}} }
   });
@@ -1223,7 +1224,7 @@ function exportAPunchExcel(){
     if(search) return p.id.toLowerCase().includes(search) || p.as.toLowerCase().includes(search);
     return true;
   });
-  let html = buildExcelHeader('Open A-Punches List');
+  let html = buildExcelHeader('Open Punches List');
   html += `<tr><th class="hdr">PL ID</th><th class="hdr" style="text-align:left;">Asset Tag</th><th class="hdr">Discipline</th><th class="hdr">Company</th><th class="hdr" style="text-align:left;">Subsystem</th><th class="hdr" style="text-align:left;">Description</th></tr>`;
   filtered.forEach(p => {
     html += `<tr><td style="font-weight:bold;color:#C00000;">${p.id}</td><td>${p.as}</td><td>${DISC_SHORT[p.di]||p.di||'-'}</td><td>${p.co}</td><td>${p.su}</td><td>${p.de}</td></tr>`;
