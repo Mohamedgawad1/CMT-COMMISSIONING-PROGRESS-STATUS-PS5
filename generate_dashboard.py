@@ -26,7 +26,7 @@ def _logo(fname):
             return _b64.b64encode(f.read()).decode('ascii')
     return ''
 LOGO_BADGE = _logo('download.jpeg')
-LOGO_SIDE = _logo('download (1).jpeg')
+LOGO_SIDE = _logo('download.jpeg')
 
 wb = openpyxl.load_workbook(EXCEL_PATH, data_only=True)
 
