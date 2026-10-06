@@ -18,6 +18,16 @@ else:
     EXCEL_PATH = sorted(xlsx_files)[-1]  # highest suffix number
 print(f'Using: {os.path.basename(EXCEL_PATH)}')
 
+import base64 as _b64
+def _logo(fname):
+    p = os.path.join(BASE_DIR, fname)
+    if os.path.exists(p):
+        with open(p, 'rb') as f:
+            return _b64.b64encode(f.read()).decode('ascii')
+    return ''
+LOGO_BADGE = _logo('download.jpeg')
+LOGO_SIDE = _logo('download (1).jpeg')
+
 wb = openpyxl.load_workbook(EXCEL_PATH, data_only=True)
 
 milestones = ['MILESTONE A', 'MILESTONE B', 'MILESTONE C', 'MILESTONE D', 'MILESTONE E', 'MILESTONE F', 'MILESTONE G', 'MILESTONE H', 'MILESTONE I']
@@ -299,59 +309,68 @@ HTML = r"""<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta http-equiv="refresh" content="900">
 <title>PS5 — CMT Pre-Commissioning Progress Dashboard</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.6 17.9 8.5A8 8 0 1 1 6.1 8.5Z' fill='%2300a88f'/%3E%3Cpath d='M8.6 13.2c.3-1.9 1.4-3.1 3.4-4.9.5 1.8 1.6 3.4 3.4 4.6 1.6 1.1 2.4 2.4 2.4 3.9a4.6 4.6 0 0 1-4.6 4.6 4.6 4.6 0 0 1-4.6-4.6c0-1.2.4-2.4 1-3.4Z' fill='%23fff'/%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
-  --bgmain:#ffffff; --panel:#ffffff; --panel2:#f5f7fa;
-  --accent:#ff4d8d; --gold:#ffb627; --teal:#00a88f; --blue:#3da8ff; --purple:#9b59f6;
-  --text:#1a1a2e; --muted:#6b7280; --border:#e0e4ea;
+  --bgmain:#f4f1ea; --panel:#ffffff; --panel2:#f6f2ea;
+  --accent:#f26b21; --gold:#f5b301; --teal:#0f8f87; --blue:#2b7fd4; --purple:#7a5aa8; --red:#d13a2a;
+  --ink:#0c2438; --text:#17324a; --muted:#5f6c7a; --border:#dcd6ca;
 }
 *{box-sizing:border-box;font-family:'Segoe UI',Tahoma,Arial,sans-serif;margin:0;padding:0;}
 body{
-  background:#ffffff;
+  background:linear-gradient(180deg,#f7f4ee 0%, #eef1e6 100%);
   color:var(--text);display:flex;
 }
 .sidebar{
-  width:240px;min-height:100vh;background:#f8f9fb;color:var(--text);padding:24px 18px;
-  position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--border);
+  width:240px;min-height:100vh;background:linear-gradient(180deg,#0c2438 0%, #102c3f 70%, #0e3a3a 100%);
+  color:#e8eef4;padding:24px 18px;
+  position:sticky;top:0;height:100vh;overflow-y:auto;border-right:2px solid #e9c04a;
+  box-shadow:inset -12px 0 24px rgba(0,0,0,.25);
 }
-.sidebar h2{font-size:17px;margin-bottom:18px;display:flex;align-items:center;gap:8px;letter-spacing:.5px;color:var(--teal);}
+.sidebar h2{font-size:16px;margin-bottom:18px;display:flex;align-items:center;gap:9px;letter-spacing:.5px;color:#f5b301;font-weight:800;border-bottom:1px solid rgba(245,179,1,.25);padding-bottom:12px;}
+.side-logo{margin-bottom:14px;text-align:center;}
+.side-logo img{max-width:150px;max-height:64px;width:auto;height:auto;object-fit:contain;border-radius:8px;background:#fff;padding:6px;border:1px solid rgba(245,179,1,.45);box-shadow:0 3px 10px rgba(0,0,0,.35);}
 .sidebar label{
   display:flex;align-items:center;gap:8px;padding:9px 8px;border-radius:8px;
-  cursor:pointer;font-size:13px;margin-bottom:3px;transition:.15s;color:var(--muted);
+  cursor:pointer;font-size:13px;margin-bottom:3px;transition:.15s;color:rgba(232,238,244,.85);
 }
-.sidebar label:hover{background:rgba(0,0,0,.04);color:var(--text);}
-.sidebar input{accent-color:var(--teal);width:16px;height:16px;}
-.sidebar .grp{margin-top:20px;font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid var(--border);padding-bottom:4px;color:var(--gold);}
+.sidebar label:hover{background:rgba(255,255,255,.07);color:#fff;}
+.sidebar input{accent-color:#f5b301;width:16px;height:16px;}
+.sidebar .grp{margin-top:20px;font-size:11px;letter-spacing:1.5px;border-bottom:1px solid rgba(245,179,1,.3);padding-bottom:4px;color:#f5b301;font-weight:700;text-transform:uppercase;opacity:.95;}
 .main{flex:1;padding:24px 32px;}
 .header{
-  background:linear-gradient(120deg,#e8edf5 0%, #dce1ea 100%);color:var(--text);padding:22px 30px;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.02) 0 1px, transparent 1px 3px),
+    linear-gradient(120deg,#0c2438 0%, #143a52 55%, #0e5a52 100%);
+  color:#fff;padding:22px 30px;
   border-radius:16px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;
-  border:1px solid var(--border);position:relative;overflow:hidden;
+  border:1px solid rgba(245,179,1,.4);border-top:4px solid #f5b301;position:relative;overflow:hidden;
 }
-.header::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 90% 10%, rgba(0,168,143,.08), transparent 60%);}
-.header h1{font-size:24px;letter-spacing:.5px;}
-.header .sub{font-size:12px;opacity:.7;margin-top:4px;color:var(--muted);}
+.header::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 88% 12%, rgba(245,179,1,.18), transparent 55%);}
+.header h1{font-size:24px;letter-spacing:.5px;text-shadow:0 2px 6px rgba(0,0,0,.35);}
+.header .sub{font-size:12px;opacity:.85;margin-top:4px;color:#cfe0ec;letter-spacing:.3px;}
 .section{display:none;}
 .section.active{display:block;}
 .kpi-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:22px;}
 .kpi{
   flex:1;min-width:170px;background:var(--panel);border-radius:14px;padding:20px;
-  text-align:center;border:1px solid var(--border);border-top:4px solid var(--purple);
+  text-align:center;border:1px solid var(--border);border-top:4px solid #f26b21;
   position:relative;overflow:hidden;transition:transform .2s, border-color .2s;
 }
-.kpi:hover{transform:translateY(-4px);border-color:var(--teal);}
+.kpi::after{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#f5b301,#f26b21);}
+.kpi:hover{transform:translateY(-4px);border-color:#c9a227;}
 .kpi.gold{border-top-color:var(--gold);}
 .kpi.teal{border-top-color:var(--teal);}
-.kpi.pink{border-top-color:var(--accent);}
+.kpi.pink{border-top-color:var(--red);}
 .kpi.blue{border-top-color:var(--blue);}
 .kpi .icon{
   font-size:22px;margin-bottom:8px;display:inline-flex;align-items:center;justify-content:center;
   width:46px;height:46px;border-radius:14px;
-  background:linear-gradient(135deg,rgba(155,89,246,.12),rgba(0,168,143,.14));
-  border:1px solid rgba(0,168,143,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
+  background:linear-gradient(135deg,rgba(242,107,33,.14),rgba(15,143,135,.16));
+  border:1px solid rgba(15,143,135,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
 }
 .kpi .val{font-size:32px;font-weight:800;color:var(--text);letter-spacing:.5px;}
 .kpi .lbl{font-size:12px;color:var(--muted);margin-top:4px;}
@@ -360,11 +379,11 @@ body{
   flex:1;min-width:340px;background:var(--panel);border-radius:14px;padding:20px;
   border:1px solid var(--border);
 }
-.chart-card h3{font-size:15px;color:var(--teal);margin-bottom:12px;font-weight:700;}
+.chart-card h3{font-size:15px;color:#0f8f87;margin-bottom:12px;font-weight:700;letter-spacing:.3px;}
 canvas{max-height:300px;}
 .section-title{
   font-size:19px;color:var(--text);font-weight:800;margin:8px 0 16px;
-  border-left:6px solid var(--accent);padding-left:12px;display:flex;align-items:center;gap:8px;
+  border-left:6px solid #f26b21;padding-left:12px;display:flex;align-items:center;gap:8px;
 }
 .progress-bar{height:10px;background:#e5e7eb;border-radius:6px;overflow:hidden;margin-top:8px;border:1px solid var(--border);}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));}
@@ -405,10 +424,11 @@ tbody tr{border-bottom:1px solid var(--border) !important;}
 .btn-refresh.spinning svg{animation:spin360 .7s linear infinite;}
 @keyframes spin360{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 .hdr-badge{
-  font-size:26px;width:54px;height:54px;display:flex;align-items:center;justify-content:center;
-  border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(255,255,255,.6));
-  border:1px solid var(--border);box-shadow:0 3px 10px rgba(0,0,0,.07);
+  width:54px;height:54px;display:flex;align-items:center;justify-content:center;
+  border-radius:14px;background:#fff;overflow:hidden;
+  border:1px solid rgba(245,179,1,.6);box-shadow:0 4px 14px rgba(0,0,0,.35);
 }
+.hdr-badge img{width:100%;height:100%;object-fit:cover;}
 .table-wrap{background:#fff;border-radius:10px;overflow:auto;max-height:540px;border:1px solid #c9c9c9;margin-bottom:18px;}
 table.data-table{width:100%;border-collapse:collapse;font-size:12px;color:#111;}
 table.data-table th{
@@ -446,7 +466,8 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
 <body>
 
 <div class="sidebar">
-  <h2>🛢️ PS5 CMT Dashboard</h2>
+  <div class="side-logo"><img src="data:image/jpeg;base64,__LOGO_SIDE__" alt="Logo"></div>
+  <h2>PS5 CMT Dashboard</h2>
   <div class="grp">📊 Pages</div>
   <label><input type="checkbox" data-target="page-overall" checked> 📈 1. Overall Progress</label>
   <label><input type="checkbox" data-target="page-subsystem" checked> 🏗️ 2. Subsystem Progress</label>
@@ -463,7 +484,7 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
       <div class="sub">EACOP Project | Data extracted from CMT Progress Status - PS5</div>
     </div>
     <div style="display:flex;align-items:center;gap:14px;position:relative;z-index:1;">
-      <div class="hdr-badge" title="CMT Based Pre-Commissioning">🛢️</div>
+      <div class="hdr-badge" title="CMT Based Pre-Commissioning"><img src="data:image/jpeg;base64,__LOGO_BADGE__" alt="Logo"></div>
       <button class="btn-refresh" id="btnRefresh" onclick="doRefresh()" title="Refresh / Update dashboard data">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
@@ -559,6 +580,12 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
     <div class="kpi-row" id="subKpis"></div>
 
     <div class="filter-bar">
+      <label>Phase:</label>
+      <select id="filterSubPhase" onchange="renderSubsystem()">
+        <option value="PCOM - Precommissioning">PCOM - Precommissioning</option>
+        <option value="COM - Commissioning">COM - Commissioning</option>
+        <option value="ALL">ALL (PCOM + COM)</option>
+      </select>
       <label>Milestone:</label>
       <select id="filterSubMs" onchange="renderSubsystem()">
         <option value="ALL">All Milestones</option>
@@ -606,6 +633,12 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
     <div id="ps6Note" style="margin:-8px 0 16px;font-size:12px;color:var(--muted);"></div>
 
     <div class="filter-bar">
+      <label>Phase:</label>
+      <select id="filterPs6Phase" onchange="renderPS6()">
+        <option value="PCOM - Precommissioning">PCOM - Precommissioning</option>
+        <option value="COM - Commissioning">COM - Commissioning</option>
+        <option value="ALL">ALL (PCOM + COM)</option>
+      </select>
       <label>Milestone:</label>
       <select id="filterPs6Ms" onchange="renderPS6()">
         <option value="ALL">All Milestones</option>
@@ -1029,14 +1062,15 @@ function getUniquePriorities(){
 }
 
 function renderSubsystem(){
+  const phaseF = document.getElementById('filterSubPhase').value;
   const msF = document.getElementById('filterSubMs').value;
   const discF = document.getElementById('filterSubDisc').value;
   const compF = document.getElementById('filterSubComp').value;
   const search = document.getElementById('searchSub').value.toLowerCase().trim();
 
-  // Filter ETASKS by company, discipline, and category (matches Excel COUNTIFS)
+  // Filter ETASKS by phase, company, discipline, and category (matches Excel COUNTIFS)
   let tasks = ETASKS.items.filter(t => {
-    if(t.ca !== 'PCOM - Precommissioning') return false;
+    if(phaseF !== 'ALL' && t.ca !== phaseF) return false;
     if(t.st === 'Blank' || t.st === '') return false;
     if(compF !== 'ALL' && t.co !== compF) return false;
     if(discF !== 'ALL' && t.ds !== discF) return false;
@@ -1608,15 +1642,41 @@ function exportAPunchExcel(){
 }
 
 function exportSubsystemExcel(){
+  const phaseF = document.getElementById('filterSubPhase').value;
   const msF = document.getElementById('filterSubMs').value;
   const discF = document.getElementById('filterSubDisc').value;
+  const compF = document.getElementById('filterSubComp').value;
   const search = document.getElementById('searchSub').value.toLowerCase().trim();
+
+  let tasks = ETASKS.items.filter(t => {
+    if(phaseF !== 'ALL' && t.ca !== phaseF) return false;
+    if(t.st === 'Blank' || t.st === '') return false;
+    if(compF !== 'ALL' && t.co !== compF) return false;
+    if(discF !== 'ALL' && t.ds !== discF) return false;
+    return true;
+  });
+  const subPri = {};
+  SUBS.forEach(s => { subPri[s.sub] = s.pri; });
+  const stats = {};
+  tasks.forEach(t => {
+    const pri = subPri[t.su];
+    if(pri && t.pr !== pri) return;
+    if(!stats[t.su]) stats[t.su] = {tt:0,cl:0};
+    stats[t.su].tt++;
+    if(t.st === 'Closed') stats[t.su].cl++;
+  });
+  const apCount = {};
+  APUNCH.items.forEach(p => { if(p.ca === 'A' && p.su) apCount[p.su] = (apCount[p.su]||0)+1; });
+
   let filtered = SUBS.filter(s => {
     if(msF !== 'ALL' && s.pri !== msF) return false;
     if(search && !s.sub.toLowerCase().includes(search)) return false;
     return true;
+  }).map(s => {
+    const st = stats[s.sub] || {tt:0,cl:0};
+    return {sys:s.sys, sub:s.sub, pri:s.pri, st:s.st, tt:st.tt, cl:st.cl, pd:st.tt-st.cl, pc:st.tt?Math.round(st.cl/st.tt*1000)/10:0, ap:apCount[s.sub]||0};
   });
-  let html = buildExcelHeader('Subsystem Progress Status');
+  let html = buildExcelHeader('Subsystem Progress Status' + (phaseF === 'ALL' ? '' : ' — ' + phaseF));
   html += `<tr><th class="hdr" style="text-align:left;">System</th><th class="hdr" style="text-align:left;">Subsystem</th>
     <th class="hdr">Milestone</th><th class="hdr">Total</th><th class="hdr">Closed</th><th class="hdr">Pending</th>
     <th class="hdr">%</th><th class="hdr">A-Punch</th><th class="hdr">Status</th></tr>`;
@@ -1672,10 +1732,35 @@ function initPs6Filters(){
 }
 
 function renderPS6(){
+  const phaseF = document.getElementById('filterPs6Phase').value;
   const msF = document.getElementById('filterPs6Ms').value;
   const search = document.getElementById('searchPs6').value.toLowerCase().trim();
 
-  const filtered = PS6.subs.filter(s => {
+  // Task stats per PS6 subsystem from EXPORTED TASKS (phase-aware)
+  const ps6Tasks = ETASKS.items.filter(t => {
+    if(phaseF !== 'ALL' && t.ca !== phaseF) return false;
+    if(t.st === 'Blank' || t.st === '') return false;
+    return true;
+  });
+  const subPri = {};
+  PS6.subs.forEach(s => { subPri[s.sub] = s.pri; });
+  const stats = {};
+  ps6Tasks.forEach(t => {
+    if(!t.su || !t.su.startsWith('PS6-')) return;
+    const pri = subPri[t.su];
+    if(pri && t.pr !== pri) return;
+    if(!stats[t.su]) stats[t.su] = {tt:0,cl:0};
+    stats[t.su].tt++;
+    if(t.st === 'Closed') stats[t.su].cl++;
+  });
+
+  const filtered = PS6.subs.map(s => {
+    const st = stats[s.sub] || {tt:0,cl:0};
+    // Fall back to workbook sheet values when no task data exists for this subsystem
+    const tt = st.tt || s.tt;
+    const cl = st.cl || s.cl;
+    return {sys:s.sys, sub:s.sub, pri:s.pri, st:s.st, tt:tt, cl:cl, pd:tt - cl, pc: st.tt ? Math.round(st.cl/st.tt*1000)/10 : (s.pc === undefined ? null : s.pc), ap:s.ap};
+  }).filter(s => {
     if(msF !== 'ALL' && s.pri !== msF) return false;
     if(search && !s.sub.toLowerCase().includes(search) && !s.sys.toLowerCase().includes(search)) return false;
     return true;
@@ -1690,12 +1775,12 @@ function renderPS6(){
   document.getElementById('ps6Kpis').innerHTML = `
     <div class="kpi"><div class="icon">📋</div><div class="val">${filtered.length}</div><div class="lbl">Subsystems</div></div>
     <div class="kpi teal"><div class="icon">✅</div><div class="val">${completed}</div><div class="lbl">Completed</div></div>
-    <div class="kpi gold"><div class="icon">📈</div><div class="val">${totalT ? pct+'%' : 'N/A'}</div><div class="lbl">Closed Tasks (${closedT}/${totalT})</div></div>
+    <div class="kpi gold"><div class="icon">📈</div><div class="val">${totalT ? pct+'%' : 'N/A'}</div><div class="lbl">${phaseF === 'ALL' ? 'All Phases' : phaseF.split(' - ')[0]} Closed (${closedT}/${totalT})</div></div>
     <div class="kpi pink"><div class="icon">📌</div><div class="val">${aPunch || PS6_SUM.a_punch || 0}</div><div class="lbl">Open A-Punches</div></div>
   `;
 
-  document.getElementById('ps6Note').innerHTML = PS6_SUM.total ? '' :
-    '⚠ Sheet <b>PS6 - SUBSYSTEMS PROGRESS</b> in the source Excel reports 0 ITRs — figures below mirror the workbook as-is.';
+  document.getElementById('ps6Note').innerHTML = (PS6_SUM.total || totalT) ? '' :
+    '⚠ No PS6 task data in the Excel export yet — values show 0 / N/A. Use the Phase & Milestone filters to view subsystems.';
 
   const agg = {}; const msOrder = [];
   filtered.forEach(s => {
@@ -1766,14 +1851,38 @@ function renderPS6(){
 }
 
 function exportPS6Excel(){
+  const phaseF = document.getElementById('filterPs6Phase').value;
   const msF = document.getElementById('filterPs6Ms').value;
   const search = document.getElementById('searchPs6').value.toLowerCase().trim();
-  let filtered = PS6.subs.filter(s => {
+
+  const ps6Tasks = ETASKS.items.filter(t => {
+    if(phaseF !== 'ALL' && t.ca !== phaseF) return false;
+    if(t.st === 'Blank' || t.st === '') return false;
+    return true;
+  });
+  const subPri = {};
+  PS6.subs.forEach(s => { subPri[s.sub] = s.pri; });
+  const stats = {};
+  ps6Tasks.forEach(t => {
+    if(!t.su || !t.su.startsWith('PS6-')) return;
+    const pri = subPri[t.su];
+    if(pri && t.pr !== pri) return;
+    if(!stats[t.su]) stats[t.su] = {tt:0,cl:0};
+    stats[t.su].tt++;
+    if(t.st === 'Closed') stats[t.su].cl++;
+  });
+
+  let filtered = PS6.subs.map(s => {
+    const st = stats[s.sub] || {tt:0,cl:0};
+    const tt = st.tt || s.tt;
+    const cl = st.cl || s.cl;
+    return {sys:s.sys, sub:s.sub, pri:s.pri, st:s.st, tt:tt, cl:cl, pd:tt-cl, pc:st.tt?Math.round(st.cl/st.tt*1000)/10:(s.pc===undefined?null:s.pc), ap:s.ap};
+  }).filter(s => {
     if(msF !== 'ALL' && s.pri !== msF) return false;
     if(search && !s.sub.toLowerCase().includes(search) && !s.sys.toLowerCase().includes(search)) return false;
     return true;
   });
-  let html = buildExcelHeader('PS6 Subsystem Progress Status');
+  let html = buildExcelHeader('PS6 Subsystem Progress Status' + (phaseF === 'ALL' ? '' : ' — ' + phaseF));
   html += `<tr><th class="hdr" style="text-align:left;">System</th><th class="hdr" style="text-align:left;">Subsystem</th>
     <th class="hdr">Milestone</th><th class="hdr">Total</th><th class="hdr">Closed</th><th class="hdr">Pending</th>
     <th class="hdr">%</th><th class="hdr">A-Punch</th><th class="hdr">Status</th></tr>`;
@@ -1799,6 +1908,8 @@ renderHydrotests();
 </script>
 </body>
 </html>"""
+
+HTML = HTML.replace('__LOGO_SIDE__', LOGO_SIDE).replace('__LOGO_BADGE__', LOGO_BADGE)
 
 for out_path in [OUTPUT_FILE, OUTPUT_FILE2]:
     with open(out_path, 'w', encoding='utf-8') as f:
