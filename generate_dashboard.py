@@ -109,6 +109,52 @@ for row in ws2.iter_rows(min_row=8, max_row=ws2.max_row, values_only=True):
         'st': status_raw
     })
 
+# ===================== PS6 SUBSYSTEMS (sheet 5 of workbook) =====================
+def spx(v):
+    s = str(v).strip()
+    if not s or s.upper() == 'N/A' or s.startswith('#'):
+        return None
+    try:
+        f = float(s)
+    except:
+        return None
+    return round(f * 100, 1) if f <= 1 else round(f, 1)
+
+ps6_summary = {'total': 0, 'closed': 0, 'open': 0, 'a_punch': 0, 'subsystems': 0, 'completed': 0}
+ps6_subs = []
+ps6_sheet = next((n for n in wb.sheetnames if n.strip().upper().startswith('PS6 - SUBSYSTEMS')), None)
+if ps6_sheet:
+    ws6 = wb[ps6_sheet]
+    rows6 = [[str(v) if v is not None else '' for v in r] for r in ws6.iter_rows(values_only=True)]
+    for i, r in enumerate(rows6[:12]):
+        lab = r[0].strip() if r else ''
+        low = lab.lower()
+        if low.startswith('total itrs'):
+            ps6_summary['total'] = si(lab.split(':', 1)[1]) if ':' in lab else 0
+        elif low.startswith('closed itrs'):
+            ps6_summary['closed'] = si(lab.split(':', 1)[1]) if ':' in lab else 0
+        elif low.startswith('open itrs'):
+            ps6_summary['open'] = si(lab.split(':', 1)[1]) if ':' in lab else 0
+        elif low.startswith('number of completed'):
+            ps6_summary['completed'] = si(r[1]) if len(r) > 1 else 0
+        for j, v in enumerate(r):
+            if str(v).strip() == 'Open Punch' and i + 1 < len(rows6) and j < len(rows6[i + 1]):
+                ps6_summary['a_punch'] = si(rows6[i + 1][j])
+    for r in rows6:
+        if len(r) < 4 or not r[1].strip().startswith('PS6-'):
+            continue
+        ps6_subs.append({
+            'sys': r[0].strip(), 'sub': r[1].strip(), 'pri': r[2].strip(),
+            'tt': si(r[3]), 'cl': si(r[4]), 'pd': si(r[5]),
+            'pc': spx(r[6]) if len(r) > 6 else None,
+            'ap': si(r[7]) if len(r) > 7 else 0,
+            'st': r[8].strip() if len(r) > 8 else ''
+        })
+    if not ps6_summary['subsystems']:
+        ps6_summary['subsystems'] = len(ps6_subs)
+    if not ps6_summary['completed']:
+        ps6_summary['completed'] = sum(1 for s in ps6_subs if s['st'] == 'COMPLETED')
+
 ws3 = wb['EXPORTED PL']
 cols = []
 pl_rows = []
@@ -240,6 +286,7 @@ data_json = json.dumps({
     'a_punches': {'total': len(a_punch_items), 'by_company': by_comp, 'by_discipline': by_disc, 'items': a_punch_items},
     'exp_tasks': {'total': len(exported_tasks), 'by_state': task_by_state, 'by_company': task_by_comp, 'by_discipline': task_by_disc, 'by_priority': task_by_pri, 'items': exported_tasks},
     'hydrotests': hydrotests,
+    'ps6': {'summary': ps6_summary, 'subs': ps6_subs},
     'comp_names': [n for n, _ in company_sections if n != 'PS5 (All)'],
     'disc_names': disc_list,
     'disc_short': DISC_SHORT,
@@ -378,10 +425,11 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
   <h2>🛢️ PS5 CMT Dashboard</h2>
   <div class="grp">📊 Pages</div>
   <label><input type="checkbox" data-target="page-overall" checked> 1. Overall Progress</label>
-  <label><input type="checkbox" data-target="page-apunch" checked> 2. Open A-Punches</label>
-  <label><input type="checkbox" data-target="page-subsystem" checked> 3. Subsystem Progress</label>
-  <label><input type="checkbox" data-target="page-tasks" checked> 4. Exported Tasks</label>
-  <label><input type="checkbox" data-target="page-hydrotests" checked> 5. Hydrotests Summary</label>
+  <label><input type="checkbox" data-target="page-subsystem" checked> 2. Subsystem Progress</label>
+  <label><input type="checkbox" data-target="page-ps6" checked> 3. PS6 - Subsystems Progress</label>
+  <label><input type="checkbox" data-target="page-hydrotests" checked> 4. Hydrotests Summary</label>
+  <label><input type="checkbox" data-target="page-tasks" checked> 5. Exported Tasks</label>
+  <label><input type="checkbox" data-target="page-apunch" checked> 6. Open A-Punches</label>
 </div>
 
 <div class="main">
@@ -396,10 +444,11 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
   <!-- ===================== TABS ===================== -->
   <div class="tab-bar">
     <div class="tab-btn active" onclick="switchTab('page-overall')">📈 1. Overall Progress</div>
-    <div class="tab-btn" onclick="switchTab('page-apunch')">📌 2. Open A-Punches</div>
-    <div class="tab-btn" onclick="switchTab('page-subsystem')">🏗️ 3. Subsystem Progress</div>
-    <div class="tab-btn" onclick="switchTab('page-tasks')">📋 4. Exported Tasks</div>
-    <div class="tab-btn" onclick="switchTab('page-hydrotests')">💧 5. Hydrotests Summary</div>
+    <div class="tab-btn" onclick="switchTab('page-subsystem')">🏗️ 2. Subsystem Progress</div>
+    <div class="tab-btn" onclick="switchTab('page-ps6')">🏭 3. PS6 - Subsystems Progress</div>
+    <div class="tab-btn" onclick="switchTab('page-hydrotests')">💧 4. Hydrotests Summary</div>
+    <div class="tab-btn" onclick="switchTab('page-tasks')">📋 5. Exported Tasks</div>
+    <div class="tab-btn" onclick="switchTab('page-apunch')">📌 6. Open A-Punches</div>
   </div>
 
   <!-- ===================== PAGE 1: OVERALL PROGRESS ===================== -->
@@ -515,6 +564,35 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
     </div>
     <div class="table-wrap" id="subsystemTableWrap"></div>
     <div class="pagination" id="subPagination"></div>
+  </div>
+
+  <!-- ===================== PAGE: PS6 - SUBSYSTEMS PROGRESS ===================== -->
+  <div class="section" id="page-ps6">
+    <div class="section-title">🏭 PS6 - Subsystems Progress</div>
+    <div class="kpi-row" id="ps6Kpis"></div>
+    <div id="ps6Note" style="margin:-8px 0 16px;font-size:12px;color:var(--muted);"></div>
+
+    <div class="filter-bar">
+      <label>Milestone:</label>
+      <select id="filterPs6Ms" onchange="renderPS6()">
+        <option value="ALL">All Milestones</option>
+      </select>
+      <label>Search:</label>
+      <input id="searchPs6" type="text" placeholder="Search system / subsystem..." oninput="renderPS6()" style="background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:13px;min-width:200px;">
+      <button class="btn-go" onclick="renderPS6()">🔍 Go</button>
+    </div>
+
+    <div class="chart-row">
+      <div class="chart-card"><h3>Subsystems by Milestone</h3><canvas id="chartPs6Ms"></canvas></div>
+      <div class="chart-card" style="flex:1.5;"><h3>Tasks — Closed vs Pending by Milestone</h3><canvas id="chartPs6Stack"></canvas></div>
+    </div>
+
+    <div class="section-title" style="font-size:15px;border-left-color:var(--teal);">📋 PS6 Subsystem Progress Table</div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+      <button class="btn-export" onclick="exportPS6Excel()">⬇️ Download PS6 Subsystems Excel</button>
+    </div>
+    <div class="table-wrap" id="ps6TableWrap"></div>
+    <div class="pagination" id="ps6Pagination"></div>
   </div>
 
   <!-- ===================== PAGE 5: HYDROTESTS SUMMARY ===================== -->
@@ -1524,12 +1602,142 @@ function exportTasksExcel(){
   downloadExcel(html, 'Exported_Tasks');
 }
 
+// ==================== PAGE: PS6 - SUBSYSTEMS PROGRESS ====================
+const PS6 = DATA.ps6 || {summary:{total:0,closed:0,open:0,a_punch:0,subsystems:0,completed:0}, subs:[]};
+const PS6_SUM = PS6.summary || {};
+let ps6Page = 1;
+const PS6_PER_PAGE = 30;
+
+function initPs6Filters(){
+  const sel = document.getElementById('filterPs6Ms');
+  const set = new Set();
+  PS6.subs.forEach(s => { if(s.pri) set.add(s.pri); });
+  Array.from(set).sort().forEach(m => { const o=document.createElement('option'); o.value=m; o.textContent=m.replace('PS6 - ',''); sel.appendChild(o); });
+}
+
+function renderPS6(){
+  const msF = document.getElementById('filterPs6Ms').value;
+  const search = document.getElementById('searchPs6').value.toLowerCase().trim();
+
+  const filtered = PS6.subs.filter(s => {
+    if(msF !== 'ALL' && s.pri !== msF) return false;
+    if(search && !s.sub.toLowerCase().includes(search) && !s.sys.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  const totalT = filtered.reduce((a,s)=>a+s.tt,0);
+  const closedT = filtered.reduce((a,s)=>a+s.cl,0);
+  const aPunch = filtered.reduce((a,s)=>a+s.ap,0);
+  const completed = filtered.filter(s=>s.st==='COMPLETED').length;
+  const pct = totalT ? Math.round(closedT/totalT*1000)/10 : 0;
+
+  document.getElementById('ps6Kpis').innerHTML = `
+    <div class="kpi"><div class="icon">📋</div><div class="val">${filtered.length}</div><div class="lbl">Subsystems</div></div>
+    <div class="kpi teal"><div class="icon">✅</div><div class="val">${completed}</div><div class="lbl">Completed</div></div>
+    <div class="kpi gold"><div class="icon">📈</div><div class="val">${totalT ? pct+'%' : 'N/A'}</div><div class="lbl">Closed Tasks (${closedT}/${totalT})</div></div>
+    <div class="kpi pink"><div class="icon">📌</div><div class="val">${aPunch || PS6_SUM.a_punch || 0}</div><div class="lbl">Open A-Punches</div></div>
+  `;
+
+  document.getElementById('ps6Note').innerHTML = PS6_SUM.total ? '' :
+    '⚠ Sheet <b>PS6 - SUBSYSTEMS PROGRESS</b> in the source Excel reports 0 ITRs — figures below mirror the workbook as-is.';
+
+  const agg = {}; const msOrder = [];
+  PS6.subs.forEach(s => {
+    const k = s.pri || 'Unassigned';
+    if(!agg[k]){ agg[k] = {count:0, t:0, c:0}; msOrder.push(k); }
+    agg[k].count++; agg[k].t += s.tt; agg[k].c += s.cl;
+  });
+  msOrder.sort();
+  const msLabels = msOrder.map(m => m.replace('PS6 - ',''));
+
+  makeChart('chartPs6Ms', {
+    type:'pie',
+    data:{ labels: msLabels, datasets:[{ data: msOrder.map(k=>agg[k].count), backgroundColor:MS_COLORS, datalabels:DL_PIE }] },
+    options:{ plugins:{legend:{position:'bottom'}} }
+  });
+
+  makeChart('chartPs6Stack', {
+    type:'bar',
+    data:{ labels: msLabels,
+      datasets:[
+        {label:'Closed', data: msOrder.map(k=>agg[k].c), backgroundColor:'#00e0c6', datalabels:DL_STACK},
+        {label:'Pending', data: msOrder.map(k=>agg[k].t - agg[k].c), backgroundColor:'#ff4d8d', datalabels:DL_STACK}
+      ]
+    },
+    options:{ plugins:{legend:{position:'bottom'}}, scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}} }
+  });
+
+  const totalPg = Math.max(1, Math.ceil(filtered.length / PS6_PER_PAGE));
+  if(ps6Page > totalPg) ps6Page = 1;
+  const start = (ps6Page-1)*PS6_PER_PAGE;
+  const pgItems = filtered.slice(start, start+PS6_PER_PAGE);
+
+  let html = `<table class="data-table" style="min-width:1100px;"><thead><tr>
+    <th style="text-align:left;">System</th>
+    <th style="text-align:left;">Subsystem</th>
+    <th>Milestone</th>
+    <th>Total</th><th>Closed</th><th>Pending</th><th>%</th><th>A-Punch</th><th>Status</th>
+  </tr></thead><tbody>`;
+  pgItems.forEach(s => {
+    const statColor = s.st === 'COMPLETED' ? '#1d6f42' : (s.ap > 0 ? '#C00000' : '#333');
+    const statBg = s.st === 'COMPLETED' ? '#e8f5e9' : (s.ap > 0 ? '#ffebee' : '#fff');
+    const pcCell = (s.pc === null || s.pc === undefined) ? '<span style="color:#999;">N/A</span>' : pctBar(s.pc);
+    html += `<tr style="background:${statBg};">
+      <td class="left" style="font-size:11px;">${s.sys.replace('PS6-','')}</td>
+      <td class="left" style="font-weight:bold;font-size:11px;">${s.sub}</td>
+      <td><span class="badge">${s.pri.replace('PS6 - ','')}</span></td>
+      <td>${s.tt}</td>
+      <td style="color:#1d6f42;font-weight:700;">${s.cl}</td>
+      <td style="color:#C00000;font-weight:700;">${s.pd}</td>
+      <td>${pcCell}</td>
+      <td style="color:${s.ap>0?'#C00000;font-weight:700':'#999'}">${s.ap}</td>
+      <td style="color:${statColor};font-weight:700;">${s.st || 'In Progress'}</td>
+    </tr>`;
+  });
+  if(!pgItems.length) html += `<tr><td colspan="9" style="padding:20px;color:#999;">No matching subsystems</td></tr>`;
+  html += `</tbody></table>`;
+  document.getElementById('ps6TableWrap').innerHTML = html;
+
+  let pagHtml = `<button onclick="ps6Page=1;renderPS6()" ${ps6Page<=1?'disabled':''}>«</button>
+    <button onclick="ps6Page=Math.max(1,ps6Page-1);renderPS6()" ${ps6Page<=1?'disabled':''}>‹</button>`;
+  for(let i=Math.max(1,ps6Page-2); i<=Math.min(totalPg,ps6Page+2); i++){
+    pagHtml += `<button class="${i===ps6Page?'active':''}" onclick="ps6Page=${i};renderPS6()">${i}</button>`;
+  }
+  pagHtml += `<button onclick="ps6Page=Math.min(${totalPg},ps6Page+1);renderPS6()" ${ps6Page>=totalPg?'disabled':''}>›</button>
+    <button onclick="ps6Page=${totalPg};renderPS6()" ${ps6Page>=totalPg?'disabled':''}>»</button>
+    <span style="font-size:12px;color:var(--muted);margin-left:8px;">${filtered.length} items</span>`;
+  document.getElementById('ps6Pagination').innerHTML = pagHtml;
+}
+
+function exportPS6Excel(){
+  const msF = document.getElementById('filterPs6Ms').value;
+  const search = document.getElementById('searchPs6').value.toLowerCase().trim();
+  let filtered = PS6.subs.filter(s => {
+    if(msF !== 'ALL' && s.pri !== msF) return false;
+    if(search && !s.sub.toLowerCase().includes(search) && !s.sys.toLowerCase().includes(search)) return false;
+    return true;
+  });
+  let html = buildExcelHeader('PS6 Subsystem Progress Status');
+  html += `<tr><th class="hdr" style="text-align:left;">System</th><th class="hdr" style="text-align:left;">Subsystem</th>
+    <th class="hdr">Milestone</th><th class="hdr">Total</th><th class="hdr">Closed</th><th class="hdr">Pending</th>
+    <th class="hdr">%</th><th class="hdr">A-Punch</th><th class="hdr">Status</th></tr>`;
+  filtered.forEach(s => {
+    const pc = (s.pc === null || s.pc === undefined) ? 'N/A' : s.pc + '%';
+    html += `<tr><td>${s.sys}</td><td style="font-weight:bold;">${s.sub}</td><td>${s.pri}</td>
+      <td>${s.tt}</td><td>${s.cl}</td><td>${s.pd}</td><td>${pc}</td><td>${s.ap}</td><td>${s.st||'In Progress'}</td></tr>`;
+  });
+  html += `</table></body></html>`;
+  downloadExcel(html, 'PS6_Subsystems_Progress');
+}
+
 // ==================== INIT ====================
 initFilters();
+initPs6Filters();
 initTasksFilters();
 renderOverall();
 renderAPunch();
 renderSubsystem();
+renderPS6();
 renderTasks();
 renderHydrotests();
 </script>
