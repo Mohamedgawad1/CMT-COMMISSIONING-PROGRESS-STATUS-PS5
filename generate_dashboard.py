@@ -212,6 +212,7 @@ for p in task_rows:
 task_by_state = dict(Counter(x['st'] for x in exported_tasks).most_common())
 task_by_comp = dict(Counter(x['co'] for x in exported_tasks).most_common())
 task_by_disc = dict(Counter(x['di'] for x in exported_tasks).most_common())
+task_by_cat = dict(Counter(x['ca'] for x in exported_tasks).most_common())
 task_by_pri = dict(Counter(x['pr'] for x in exported_tasks).most_common())
 
 by_comp = dict(Counter(x['co'] for x in a_punch_items).most_common())
@@ -284,7 +285,7 @@ data_json = json.dumps({
     'overall': overall_data,
     'subsystems': subs,
     'a_punches': {'total': len(a_punch_items), 'by_company': by_comp, 'by_discipline': by_disc, 'items': a_punch_items},
-    'exp_tasks': {'total': len(exported_tasks), 'by_state': task_by_state, 'by_company': task_by_comp, 'by_discipline': task_by_disc, 'by_priority': task_by_pri, 'items': exported_tasks},
+    'exp_tasks': {'total': len(exported_tasks), 'by_state': task_by_state, 'by_company': task_by_comp, 'by_discipline': task_by_disc, 'by_priority': task_by_pri, 'by_category': task_by_cat, 'items': exported_tasks},
     'hydrotests': hydrotests,
     'ps6': {'summary': ps6_summary, 'subs': ps6_subs},
     'comp_names': [n for n, _ in company_sections if n != 'PS5 (All)'],
@@ -346,7 +347,12 @@ body{
 .kpi.teal{border-top-color:var(--teal);}
 .kpi.pink{border-top-color:var(--accent);}
 .kpi.blue{border-top-color:var(--blue);}
-.kpi .icon{font-size:24px;margin-bottom:6px;}
+.kpi .icon{
+  font-size:22px;margin-bottom:8px;display:inline-flex;align-items:center;justify-content:center;
+  width:46px;height:46px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(155,89,246,.12),rgba(0,168,143,.14));
+  border:1px solid rgba(0,168,143,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
+}
 .kpi .val{font-size:32px;font-weight:800;color:var(--text);letter-spacing:.5px;}
 .kpi .lbl{font-size:12px;color:var(--muted);margin-top:4px;}
 .chart-row{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:22px;}
@@ -386,6 +392,23 @@ tbody tr{border-bottom:1px solid var(--border) !important;}
   transition:.15s;
 }
 .btn-go:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(61,168,255,.4);}
+.btn-refresh{
+  display:inline-flex;align-items:center;gap:9px;padding:11px 20px;border:none;cursor:pointer;
+  border-radius:12px;font-size:13px;font-weight:800;letter-spacing:.3px;color:#fff;
+  background:linear-gradient(120deg,#00a88f,#0f7d9e);box-shadow:0 5px 16px rgba(0,168,143,.35);
+  transition:.18s;
+}
+.btn-refresh:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,168,143,.5);}
+.btn-refresh:active{transform:translateY(0) scale(.98);}
+.btn-refresh svg{display:block;transition:transform .5s ease;}
+.btn-refresh:hover svg{transform:rotate(180deg);}
+.btn-refresh.spinning svg{animation:spin360 .7s linear infinite;}
+@keyframes spin360{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.hdr-badge{
+  font-size:26px;width:54px;height:54px;display:flex;align-items:center;justify-content:center;
+  border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(255,255,255,.6));
+  border:1px solid var(--border);box-shadow:0 3px 10px rgba(0,0,0,.07);
+}
 .table-wrap{background:#fff;border-radius:10px;overflow:auto;max-height:540px;border:1px solid #c9c9c9;margin-bottom:18px;}
 table.data-table{width:100%;border-collapse:collapse;font-size:12px;color:#111;}
 table.data-table th{
@@ -404,12 +427,13 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
 
 .tab-bar{display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap;}
 .tab-btn{
-  padding:10px 24px;border-radius:10px 10px 0 0;font-size:14px;font-weight:700;
+  padding:10px 22px;border-radius:10px 10px 0 0;font-size:14px;font-weight:700;
   cursor:pointer;border:1px solid var(--border);border-bottom:none;
   background:var(--panel2);color:var(--muted);transition:.15s;
+  display:inline-flex;align-items:center;gap:8px;
 }
-.tab-btn.active{background:var(--panel);color:var(--teal);border-color:var(--teal);}
-.tab-btn:hover{color:var(--text);}
+.tab-btn.active{background:var(--panel);color:var(--teal);border-color:var(--teal);box-shadow:0 -4px 12px rgba(0,168,143,.10);transform:translateY(-2px);}
+.tab-btn:hover{color:var(--text);transform:translateY(-2px);}
 
 .pagination{display:flex;justify-content:center;gap:6px;margin-top:12px;flex-wrap:wrap;}
 .pagination button{
@@ -424,12 +448,12 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
 <div class="sidebar">
   <h2>🛢️ PS5 CMT Dashboard</h2>
   <div class="grp">📊 Pages</div>
-  <label><input type="checkbox" data-target="page-overall" checked> 1. Overall Progress</label>
-  <label><input type="checkbox" data-target="page-subsystem" checked> 2. Subsystem Progress</label>
-  <label><input type="checkbox" data-target="page-ps6" checked> 3. PS6 - Subsystems Progress</label>
-  <label><input type="checkbox" data-target="page-hydrotests" checked> 4. Hydrotests Summary</label>
-  <label><input type="checkbox" data-target="page-tasks" checked> 5. Exported Tasks</label>
-  <label><input type="checkbox" data-target="page-apunch" checked> 6. Open A-Punches</label>
+  <label><input type="checkbox" data-target="page-overall" checked> 📈 1. Overall Progress</label>
+  <label><input type="checkbox" data-target="page-subsystem" checked> 🏗️ 2. Subsystem Progress</label>
+  <label><input type="checkbox" data-target="page-ps6" checked> 🏭 3. PS6 - Subsystems Progress</label>
+  <label><input type="checkbox" data-target="page-hydrotests" checked> 💧 4. Hydrotests Summary</label>
+  <label><input type="checkbox" data-target="page-tasks" checked> 📋 5. Exported Tasks</label>
+  <label><input type="checkbox" data-target="page-apunch" checked> 📌 6. Open Punches</label>
 </div>
 
 <div class="main">
@@ -438,7 +462,16 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
       <h1>📊 PS5 — CMT Based Pre-Commissioning Progress Status</h1>
       <div class="sub">EACOP Project | Data extracted from CMT Progress Status - PS5</div>
     </div>
-    <div style="font-size:38px;">📋</div>
+    <div style="display:flex;align-items:center;gap:14px;position:relative;z-index:1;">
+      <div class="hdr-badge" title="CMT Based Pre-Commissioning">🛢️</div>
+      <button class="btn-refresh" id="btnRefresh" onclick="doRefresh()" title="Refresh / Update dashboard data">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
+          <polyline points="21 3 21 9 15 9"></polyline>
+        </svg>
+        <span>Update</span>
+      </button>
+    </div>
   </div>
 
   <!-- ===================== TABS ===================== -->
@@ -448,7 +481,7 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
     <div class="tab-btn" onclick="switchTab('page-ps6')">🏭 3. PS6 - Subsystems Progress</div>
     <div class="tab-btn" onclick="switchTab('page-hydrotests')">💧 4. Hydrotests Summary</div>
     <div class="tab-btn" onclick="switchTab('page-tasks')">📋 5. Exported Tasks</div>
-    <div class="tab-btn" onclick="switchTab('page-apunch')">📌 6. Open A-Punches</div>
+    <div class="tab-btn" onclick="switchTab('page-apunch')">📌 6. Open Punches</div>
   </div>
 
   <!-- ===================== PAGE 1: OVERALL PROGRESS ===================== -->
@@ -638,6 +671,12 @@ table.data-table tr.total td{background:#404040 !important;color:#fff;font-weigh
     <div class="kpi-row" id="tasksKpis"></div>
 
     <div class="filter-bar">
+      <label>Phase:</label>
+      <select id="filterTPhase" onchange="renderTasks()">
+        <option value="ALL">All Phases</option>
+        <option value="PCOM - Precommissioning">PCOM - Precommissioning</option>
+        <option value="COM - Commissioning">COM - Commissioning</option>
+      </select>
       <label>Company:</label>
       <select id="filterTComp" onchange="renderTasks()">
         <option value="ALL">All Companies</option>
@@ -718,6 +757,12 @@ function switchTab(id){
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelector(`.tab-btn[onclick*="${id}"]`).classList.add('active');
+}
+
+function doRefresh(){
+  const b = document.getElementById('btnRefresh');
+  if(b) b.classList.add('spinning');
+  setTimeout(()=>location.reload(), 450);
 }
 
 function pctBar(pct){
@@ -1170,9 +1215,16 @@ function initTasksFilters(){
   Object.keys(ETASKS.by_priority).forEach(p=>{ const o=document.createElement('option'); o.value=p; o.textContent=p.replace('PS5 - ',''); selp.appendChild(o); });
   const sels = document.getElementById('filterTState');
   Object.keys(ETASKS.by_state).forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; sels.appendChild(o); });
+  const selph = document.getElementById('filterTPhase');
+  const cats = Object.keys(ETASKS.by_category || {});
+  if(cats.length){
+    selph.innerHTML = '<option value="ALL">All Phases</option>';
+    cats.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; selph.appendChild(o); });
+  }
 }
 
 function renderTasks(){
+  const phaseF = document.getElementById('filterTPhase').value;
   const compF = document.getElementById('filterTComp').value;
   const discF = document.getElementById('filterTDisc').value;
   const priF = document.getElementById('filterTPri').value;
@@ -1180,6 +1232,7 @@ function renderTasks(){
   const search = document.getElementById('searchTasks').value.toLowerCase().trim();
 
   let filtered = ETASKS.items.filter(t => {
+    if(phaseF !== 'ALL' && t.ca !== phaseF) return false;
     if(compF !== 'ALL' && t.co !== compF) return false;
     if(discF !== 'ALL' && t.di !== discF) return false;
     if(priF !== 'ALL' && t.pr !== priF) return false;
@@ -1192,8 +1245,9 @@ function renderTasks(){
   const closedCount = filtered.filter(t => t.st === 'Closed').length;
   const openCount = filtered.filter(t => t.st === 'To be completed').length;
   const tOther = filtered.length - closedCount - openCount;
+  const phaseLabel = phaseF === 'ALL' ? 'All Phases' : phaseF.split(' - ')[0];
   document.getElementById('tasksKpis').innerHTML = `
-    <div class="kpi teal"><div class="icon">📋</div><div class="val">${filtered.length.toLocaleString()}</div><div class="lbl">Filtered Tasks</div></div>
+    <div class="kpi teal"><div class="icon">📋</div><div class="val">${filtered.length.toLocaleString()}</div><div class="lbl">${phaseLabel} — Filtered Tasks</div></div>
     <div class="kpi"><div class="icon">✅</div><div class="val">${closedCount.toLocaleString()}</div><div class="lbl">Closed</div></div>
     <div class="kpi pink"><div class="icon">⏳</div><div class="val">${openCount.toLocaleString()}</div><div class="lbl">To Be Completed</div></div>
     <div class="kpi gold"><div class="icon">🔍</div><div class="val">${ETASKS.total.toLocaleString()}</div><div class="lbl">Total (Unfiltered)</div></div>
@@ -1544,7 +1598,7 @@ function exportAPunchExcel(){
     if(search) return p.id.toLowerCase().includes(search) || p.as.toLowerCase().includes(search);
     return true;
   });
-  let html = buildExcelHeader('Open A-Punches List');
+  let html = buildExcelHeader('Open Punches List');
   html += `<tr><th class="hdr">PL ID</th><th class="hdr" style="text-align:left;">Asset Tag</th><th class="hdr">Discipline</th><th class="hdr">Company</th><th class="hdr" style="text-align:left;">Subsystem</th><th class="hdr" style="text-align:left;">Description</th></tr>`;
   filtered.forEach(p => {
     html += `<tr><td style="font-weight:bold;color:#C00000;">${p.id}</td><td>${p.as}</td><td>${DISC_SHORT[p.di]||p.di||'-'}</td><td>${p.co}</td><td>${p.su}</td><td>${p.de}</td></tr>`;
@@ -1579,8 +1633,10 @@ function exportTasksExcel(){
   const discF = document.getElementById('filterTDisc').value;
   const priF = document.getElementById('filterTPri').value;
   const stateF = document.getElementById('filterTState').value;
+  const phaseF = document.getElementById('filterTPhase').value;
   const search = document.getElementById('searchTasks').value.toLowerCase().trim();
   let filtered = ETASKS.items.filter(t => {
+    if(phaseF !== 'ALL' && t.ca !== phaseF) return false;
     if(compF !== 'ALL' && t.co !== compF) return false;
     if(discF !== 'ALL' && t.di !== discF) return false;
     if(priF !== 'ALL' && t.pr !== priF) return false;
@@ -1588,15 +1644,15 @@ function exportTasksExcel(){
     if(search && !t.id.toLowerCase().includes(search) && !t.as.toLowerCase().includes(search)) return false;
     return true;
   });
-  let html = buildExcelHeader('Exported Tasks Registry');
+  let html = buildExcelHeader('Exported Tasks Registry' + (phaseF === 'ALL' ? '' : ' — ' + phaseF));
   html += `<tr><th class="hdr">Task ID</th><th class="hdr" style="text-align:left;">Asset Tag</th>
     <th class="hdr" style="text-align:left;">Description</th><th class="hdr">Discipline</th>
     <th class="hdr">Company</th><th class="hdr" style="text-align:left;">Subsystem</th>
-    <th class="hdr">Milestone</th><th class="hdr">State</th></tr>`;
+    <th class="hdr">Phase</th><th class="hdr">Milestone</th><th class="hdr">State</th></tr>`;
   filtered.forEach(t => {
     html += `<tr><td>${t.id}</td><td>${t.as}</td><td>${t.de}</td>
       <td>${DISC_SHORT[t.di]||t.di||'-'}</td><td>${t.co}</td><td>${t.su}</td>
-      <td>${t.pr.replace('PS5 - ','')}</td><td>${t.st}</td></tr>`;
+      <td>${(t.ca||'-').split(' - ')[0]}</td><td>${t.pr.replace('PS5 - ','')}</td><td>${t.st}</td></tr>`;
   });
   html += `</table></body></html>`;
   downloadExcel(html, 'Exported_Tasks');
@@ -1642,7 +1698,7 @@ function renderPS6(){
     '⚠ Sheet <b>PS6 - SUBSYSTEMS PROGRESS</b> in the source Excel reports 0 ITRs — figures below mirror the workbook as-is.';
 
   const agg = {}; const msOrder = [];
-  PS6.subs.forEach(s => {
+  filtered.forEach(s => {
     const k = s.pri || 'Unassigned';
     if(!agg[k]){ agg[k] = {count:0, t:0, c:0}; msOrder.push(k); }
     agg[k].count++; agg[k].t += s.tt; agg[k].c += s.cl;
